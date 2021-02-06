@@ -1,5 +1,4 @@
 #include "calc.h"
-#include <sstream>
 
 std::string calc(double a, double b, operation op){
     switch(op){

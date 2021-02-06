@@ -1,5 +1,4 @@
 #include <string>
-#include <sstream>
 
 enum operation{
     SUM = 1,
