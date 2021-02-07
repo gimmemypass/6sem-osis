@@ -3,12 +3,12 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+#include <iostream>
 #define PORT 9090
 
 int main(int argc, char const *argv[]){
     int sock = 0, valread;
     sockaddr_in serv_addr;
-    char *hello = "Hello from client";
     char buffer[1024] = {0};
     if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
         printf("\n Socket creation error \n");
@@ -27,8 +27,12 @@ int main(int argc, char const *argv[]){
         printf("\nConnection Failed \n");
         return -1;
     }
-    send(sock, hello, strlen(hello), 0);
-    printf("hello message sent\n");
+    std::string message;
+    std::cin >> message;
+    char char_array[message.length() + 1];
+    strcpy(char_array, message.c_str());
+
+    send(sock, char_array, strlen(char_array), 0);
     valread = read(sock, buffer, 1024);
     printf("%s\n", buffer);
     return 0;

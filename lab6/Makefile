@@ -4,7 +4,7 @@ app: client server
 .PHONY: app
 
 server: server.cpp algo.cpp create_build_dir
-		g++ server.cpp algo.cpp -o $(BUILD_DIR)/server 
+		g++ -pthread server.cpp algo.cpp -o $(BUILD_DIR)/server 
 .PHONY: app
 
 client: client.cpp create_build_dir

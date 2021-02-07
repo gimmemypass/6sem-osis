@@ -7,12 +7,28 @@
 #include "algo.h"
 #define PORT 9090
 
+void* process_client(void *arg){
+    int client = *((int*)arg);
+    char buffer[1024] = {0};
+    int valread = read( client, buffer, 1024);
+    printf("RECEIVED : %s\n", buffer);
+    std::string res = "";
+    for(int i = 0; i < 1024; i++){
+        res += convert(buffer[i]);
+    }
+    int n = res.length();
+    char char_array[n + 1];
+    strcpy(char_array, res.c_str());
+
+    send(client, char_array, strlen(char_array), 0);
+    printf("SENT : %s\n", char_array);
+}
+
 int main(int argc, char const *argv[]){
-    int server_fd, new_socket, valread;
+    int server_fd, valread;
     sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    char buffer[1024] = {0};
 
     if((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0){
         perror("socket failed");
@@ -36,22 +52,15 @@ int main(int argc, char const *argv[]){
         perror("listen");
         exit(EXIT_FAILURE);
     }
-    if((new_socket = accept(server_fd, (sockaddr*)&address, (socklen_t*)&addrlen)) < 0){
-        perror("accept");
-        exit(EXIT_FAILURE);
+    while(true){
+        int new_socket;
+        if((new_socket = accept(server_fd, (sockaddr*)&address, (socklen_t*)&addrlen)) < 0){
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
+        pthread_t pid;
+        pthread_create(&pid, nullptr, process_client, &new_socket);
+        // process_client(&new_socket);
     }
-
-    valread = read( new_socket, buffer, 1024);
-    printf("RECEIVED : %s\n", buffer);
-    std::string res = "";
-    for(int i = 0; i < 1024; i++){
-        res += convert(buffer[i]);
-    }
-    int n = res.length();
-    char char_array[n + 1];
-    strcpy(char_array, res.c_str());
-
-    send(new_socket, char_array, strlen(char_array), 0);
-    printf("SENT : %s\n", char_array);
     return 0;
 }
